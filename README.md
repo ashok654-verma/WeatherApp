@@ -1,34 +1,51 @@
-# 🌦️ React Native Weather App
+# 🌤️ Weather Forecast App
 
-A responsive cross-platform weather forecast app built with React Native, TypeScript, and MVVM architecture. The app fetches real-time weather data using the OpenWeatherMap API and adapts UI elements such as background gradients and buttons based on weather conditions. Features include dark mode support, persistent last-searched city storage, and dynamic theming for iOS and Android.
+A beautifully designed, cross-platform **React Native** app that delivers **real-time weather data** using the OpenWeatherMap API. Built using the **MVVM architecture**, the app features **adaptive theming** (sunny, rainy, cloudy), **offline storage**, and providing a smooth and responsive user experience on both **iOS** and **Android** devices.
+
+---
+
+## 📸 Screenshots
+
+![Android](./screenshots/android.png)
+![iOS](./screenshots/iOS.png)
+
+---
+
+## 🛠️ Tech Stack
+
+| Category        | Tech Used                                  |
+|-----------------|---------------------------------------------|
+| Language        | TypeScript                                  |
+| Framework       | React Native (CLI)                          |
+| Architecture    | MVVM (Model-View-ViewModel)                 |
+| State Management| React Context or Redux (depending on setup) |
+| API             | [OpenWeatherMap](https://openweathermap.org/api) |
+| Styling         | StyleSheet + Dynamic gradients              |
+| Theming         | Light/Dark mode, weather-based background   |
+| Testing         | Jest + @testing-library/react-native        |
+| Storage         | Context API, AsyncStorage (for offline caching)          |
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### ✅ Prerequisites
 
-- Node.js (v16 or later recommended)
+- Node.js (v16+ recommended)
 - React Native CLI
-- Xcode (for iOS) or Android Studio (for Android)
-- An API key from [OpenWeatherMap](https://openweathermap.org/api)
+- Xcode (for iOS development)
+- Android Studio (for Android development)
+- OpenWeatherMap API key
 
 ---
 
 ### 📦 Installation
 
 ```bash
-git clone https://github.com/ashok654-verma/WeatherApp.git
+git clone https://github.com/your-username/weather-app.git
+cd weather-app
 npm install
-
-## Android
-npx react-native run-android
-
-## iOS
 cd ios && pod install && cd ..
+npx react-native run-android
+# or
 npx react-native run-ios
-
-## Running Tests 
-npm test
-
-
