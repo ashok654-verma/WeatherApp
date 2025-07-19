@@ -2,5 +2,6 @@
   "extends": "@react-native/typescript-config",
   "compilerOptions": {
     "types": ["jest"]
-  }
+  },
+   "include": ["env.d.ts", "src"]
 }

@@ -1,45 +1,48 @@
 import React from 'react';
-import { ActivityIndicator, SafeAreaView, Text, ScrollView } from 'react-native';
-import { styles } from './styles';
-import { useHomeViewModel } from '../../viewmodels/HomeViewModel';
-import CityInput from '../../components/CityInput';
-import WeatherCard from '../../components/WeatherCard';
-import ErrorMessage from '../../components/ErrorMessage';
-import LinearGradient from 'react-native-linear-gradient';
-import { getBackgroundGradient } from '../../theme/weatherTheme';
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import CityHeader from '../../components/CityHeader';
+import TodayForecast from '../../components/TodayForecast';
+import WeeklyForecast from '../../components/WeeklyForecast';
+import CurrentWeatherCard from '../../components/CurrentWeatherCard';
+import colors from '../../utils/colors';
+
 
 const HomeScreen = () => {
-  const { city, setCity, weather, loading, error, getWeather } = useHomeViewModel();
-  const condition = error ? 'error' : weather?.weather?.[0]?.main ?? '';
-
   return (
     <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={getBackgroundGradient(condition || '')}
-        style={styles.container}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Text style={styles.appTitleStyle}>Weather App</Text>
+      <ScrollView contentContainerStyle={styles.content}>
+        <View>
 
-          <CityInput
-            city={city}
-            onChange={setCity}
-            currentWeatherCondition={condition}
-            onSubmit={() => getWeather(city)}
-          />
-
-          {loading && <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />}
-
-          {error && <ErrorMessage message={error} />}
-
-          {weather && <WeatherCard data={weather} />}
-        </ScrollView>
-      </LinearGradient>
+        <Text style={styles.headerTitle}>Weather App</Text>
+        <CityHeader />
+        <CurrentWeatherCard />
+        <TodayForecast />
+        <WeeklyForecast />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 export default HomeScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  content: {
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    gap: 20,
+    marginTop: 30
+
+  },
+  headerTitle : {
+    fontSize : 20,
+    color : colors.black,
+    fontWeight : '600',
+    marginStart :12,
+    marginVertical :24
+  }
+});

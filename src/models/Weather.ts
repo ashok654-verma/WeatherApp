@@ -8,7 +8,11 @@ export interface WeatherData {
   };
   weather: {
     main: string;
+    description: string;
     icon: string;
-    description : string;
   }[];
+  coord: {
+    lat: number;
+    lon: number;
+  };
 }
