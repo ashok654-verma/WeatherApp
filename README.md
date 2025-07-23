@@ -12,7 +12,11 @@ A beautifully designed, cross-platform **React Native** app that delivers **real
 
 ### Android
 ![Android](./screenshots/_1.png)
+
+
 ![Android](./screenshots/_2.png)
+
+
 ![Android](./screenshots/_3.png)
 
 
