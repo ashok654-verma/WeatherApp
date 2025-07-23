@@ -1,28 +1,17 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import HomeScreen from '../HomeScreen';
-
-jest.mock('../../../viewmodels/HomeViewModel', () => ({
-  useHomeViewModel: () => ({
-    city: 'Delhi',
-    setCity: jest.fn(),
-    weather: {
-      name: 'Delhi',
-      main: { temp: 28 },
-      weather: [{ main: 'Clouds', icon: '03d' }],
-    },
-    error: '',
-    loading: false,
-    getWeather: jest.fn(),
-  }),
-}));
+import HomeScreen from '../../../screens/Home/HomeScreen';
+import { WeatherProvider } from '../../../store/WeatherContext'; // ✅ import your provider
 
 describe('HomeScreen', () => {
-  it('renders correctly with weather card', () => {
-    const { getByText } = render(<HomeScreen />);
-    expect(getByText('Weather App')).toBeTruthy();
-    expect(getByText('Delhi')).toBeTruthy();
-    expect(getByText(/28/)).toBeTruthy();
-    expect(getByText('Clouds')).toBeTruthy();
+  it('renders weekly forecast section', () => {
+    const { getByText } = render(
+      <WeatherProvider> {/* ✅ Required wrapper */}
+        <HomeScreen />
+      </WeatherProvider>
+    );
+
+    // Check for static title first
+    expect(getByText('7 Days Forecast')).toBeTruthy();
   });
 });

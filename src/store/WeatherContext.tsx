@@ -6,7 +6,7 @@ import { OPENWEATHER_API_KEY } from '@env';
 interface WeatherContextType {
   weather: WeatherData | null;
   forecast: ForecastDay[];
-  hourlyForecast: HourlyForecastItem[]; // ✅ Included in context type
+  hourlyForecast: HourlyForecastItem[]; //  Included in context type
   fetchWeatherByCity: (city: string) => Promise<void>;
   getWeather: (city: string) => Promise<void>;
   isLoading: boolean;
@@ -74,7 +74,7 @@ export const useWeather = (): WeatherContextType => {
   return context;
 };
 
-// ✅ Utility function to get hourly data
+//  Utility function to get hourly data
 export const getHourlyForecast = async (city: string): Promise<HourlyForecastItem[]> => {
   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric`;
   const res = await fetch(url);

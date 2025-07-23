@@ -9,12 +9,13 @@ const CurrentWeatherCard = () => {
 
   const temperature = Math.round(weather.main.temp);
   const iconCode = weather.weather[0].icon;
-  const condition = weather.weather[0].main;
+  const rawCondition = weather.weather[0].main;
+  const condition = rawCondition.charAt(0).toUpperCase() + rawCondition.slice(1);
   const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: iconUrl }} style={styles.icon} />
+      <Image testID="weather-icon" source={{ uri: iconUrl }} style={styles.icon} />
       <Text style={styles.temperature}>{temperature}°</Text>
       <Text style={styles.condition}>{condition}</Text>
     </View>

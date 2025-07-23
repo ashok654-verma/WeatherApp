@@ -1,80 +1,86 @@
-import { useContext, useState, useEffect, useCallback} from 'react';
+// src/viewModel/__tests__/HomeViewModel.test.tsx
+
+import React from 'react';
+import { renderHook, act } from '@testing-library/react-hooks';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { WeatherContext } from '../store/WeatherContext';
-import { fetchWeatherByCity } from '../services/weatherService';
+import { WeatherProvider } from '../../store/WeatherContext';
+import { useHomeViewModel } from 'viewModel/HomeViewModel';
+import * as weatherService from '../services/weatherService.ts';
 
-// export const useHomeViewModel = () => {
-//   const { weather, setWeather } = useContext(WeatherContext);
-//   const [city, setCity] = useState('');
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState('');
-
-
-// const getWeather = useCallback(async (cityName: string) => {
-//   try {
-//     setLoading(true);
-//     setError('');
-//     const data = await fetchWeatherByCity(cityName);
-//     setWeather(data);
-//     await AsyncStorage.setItem('lastCity', cityName);
-//   } catch {
-//     setError('City not found');
-//     setWeather(null);
-//   } finally {
-//     setLoading(false);
-//   }
-// }, [setWeather]);
-
-// useEffect(() => {
-//   const loadLastCity = async () => {
-//     const lastCity = await AsyncStorage.getItem('lastCity');
-//     if (lastCity) {
-//       setCity(lastCity);
-//       getWeather(lastCity);
-//     }
-//   };
-//   loadLastCity();
-// }, [getWeather]); //  safe and predictable
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+}));
 
 
-//   return { city, setCity, weather, loading, error, getWeather };
-// };
 
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <WeatherProvider>{children}</WeatherProvider>
+);
 
-export const useHomeViewModel = () => {
-  const context = useContext(WeatherContext);
-  if (!context) throw new Error('useHomeViewModel must be used within WeatherProvider');
+describe('useHomeViewModel', () => {
+  const mockWeatherData = {
+    main: { temp: 25 },
+    weather: [{ main: 'Clear', description: 'clear sky', icon: '01d' }],
+    dt: 1625151600,
+    name: 'Delhi',
+  };
 
-  const { weather, setWeather } = context;
-  const [city, setCity] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-  const getWeather = useCallback(async (cityName: string) => {
-    try {
-      setLoading(true);
-      setError('');
-      const data = await fetchWeatherByCity(cityName);
-      setWeather(data);
-      await AsyncStorage.setItem('lastCity', cityName);
-    } catch {
-      setError('City not found');
-      setWeather(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [setWeather]);
+  it('loads last city from AsyncStorage and fetches weather', async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValue('Delhi');
+    (weatherService.fetchWeatherByCity as jest.Mock).mockResolvedValue(mockWeatherData);
 
-  useEffect(() => {
-    const loadLastCity = async () => {
-      const lastCity = await AsyncStorage.getItem('lastCity');
-      if (lastCity) {
-        setCity(lastCity);
-        getWeather(lastCity);
-      }
-    };
-    loadLastCity();
-  }, [getWeather]);
+    const { result, waitForNextUpdate } = renderHook(() => useHomeViewModel(), { wrapper });
 
-  return { city, setCity, weather, loading, error, getWeather };
-};
+    await waitForNextUpdate(); // wait for loadLastCity + getWeather to finish
+
+    expect(result.current.city).toBe('Delhi');
+    expect(result.current.weather).toEqual(mockWeatherData);
+    expect(AsyncStorage.getItem).toHaveBeenCalledWith('lastCity');
+    expect(weatherService.fetchWeatherByCity).toHaveBeenCalledWith('Delhi');
+  });
+
+  it('handles error if fetchWeatherByCity fails', async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValue('InvalidCity');
+    (weatherService.fetchWeatherByCity as jest.Mock).mockRejectedValue(new Error('404'));
+
+    const { result, waitForNextUpdate } = renderHook(() => useHomeViewModel(), { wrapper });
+
+    await waitForNextUpdate();
+
+    expect(result.current.city).toBe('InvalidCity');
+    expect(result.current.weather).toBe(null);
+    expect(result.current.error).toBe('City not found');
+  });
+
+  it('can fetch weather manually with getWeather()', async () => {
+    (weatherService.fetchWeatherByCity as jest.Mock).mockResolvedValue(mockWeatherData);
+
+    const { result } = renderHook(() => useHomeViewModel(), { wrapper });
+
+    await act(async () => {
+      await result.current.getWeather('Mumbai');
+    });
+
+    expect(result.current.city).toBe(''); // still stays blank unless set manually
+    expect(result.current.weather).toEqual(mockWeatherData);
+    expect(AsyncStorage.setItem).toHaveBeenCalledWith('lastCity', 'Mumbai');
+  });
+
+  it('handles fetch error from manual getWeather()', async () => {
+    (weatherService.fetchWeatherByCity as jest.Mock).mockRejectedValue(new Error('API Error'));
+
+    const { result } = renderHook(() => useHomeViewModel(), { wrapper });
+
+    await act(async () => {
+      await result.current.getWeather('Nowhere');
+    });
+
+    expect(result.current.weather).toBe(null);
+    expect(result.current.error).toBe('City not found');
+  });
+});
